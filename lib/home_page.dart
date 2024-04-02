@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'api.dart';
+import 'dart:convert';
+import 'date.dart';
 
 class HomePage extends StatefulWidget {
+
   const HomePage({Key? key}) : super(key: key);
   
   @override
@@ -9,6 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  Future<Date?>? date;  
 
   DateTime _dateTime = DateTime.now();
 
@@ -24,6 +31,7 @@ class _HomePageState extends State<HomePage> {
 
     if(_picked != null) {
       setState(() {
+        _dateTime = _picked;
         _dateController.text = _picked.toString().split(" ")[0];
       });
     }
@@ -67,12 +75,12 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   controller: _dateController,
                   decoration: InputDecoration(
-                  labelText: 'DATE',
-                  filled: true,
-                  prefixIcon: Icon(Icons.calendar_today),
-                  enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide.none 
-                  ),
+                    labelText: 'DATE',
+                    filled: true,
+                    prefixIcon: Icon(Icons.calendar_today),
+                    enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide.none 
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)
                   ),
@@ -89,7 +97,7 @@ class _HomePageState extends State<HomePage> {
             Transform.translate(
               offset: Offset(0,50),
               child: MaterialButton (
-                  onPressed: () => null,
+                  onPressed: () => fetchWeatherPrediction(_dateController.text),
                   child: const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
