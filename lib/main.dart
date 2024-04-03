@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'forecast_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-      theme: ThemeData(brightness: Brightness.dark),
+      title: 'Weather App',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(),
+        '/forecast_page': (context) => ForecastPage(),
+      },
     );
-  } 
-
+  }
 }
+

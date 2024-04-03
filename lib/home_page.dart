@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'api.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'date.dart';
+import 'weather.dart';
+import 'api.dart';
+import 'forecast_page.dart';
 
 class HomePage extends StatefulWidget {
-
   const HomePage({Key? key}) : super(key: key);
-  
+
   @override
   _HomePageState createState() => _HomePageState();
-  
 }
 
 class _HomePageState extends State<HomePage> {
-
-  Future<Date?>? date;  
-
   DateTime _dateTime = DateTime.now();
-
   TextEditingController _dateController = TextEditingController();
 
   void _showDatePicker() async {
-   DateTime? _picked = await showDatePicker(
-      context: context, 
+    DateTime? _picked = await showDatePicker(
+      context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000), 
+      firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
 
-    if(_picked != null) {
+    if (_picked != null) {
       setState(() {
         _dateTime = _picked;
         _dateController.text = _picked.toString().split(" ")[0];
@@ -37,37 +34,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _navigateToForecastPage() async {
+  try {
+      Weather weather = await fetchWeatherPrediction(_dateController.text);
+      ForecastPage forecastPage = ForecastPage();
+      forecastPage.weather = weather;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => forecastPage,
+        ),
+      );
+  } catch (e) {
+    print('Error fetching weather prediction: $e');
+  }
+}
+
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            
             Transform.translate(
-              offset: Offset(0,0),
+              offset: Offset(0, 0),
               child: Image.asset(
                 'assets/cloudy.png',
-                 height: 130,
-                 width: 130,  
-              )
+                height: 130,
+                width: 130,
+              ),
             ),
-            
             Transform.translate(
-              offset: Offset(0,-80),
-              child: Text (
-              'Bassell weather forecaster',
-               style: 
-                  TextStyle (
-                    fontSize: 28,
-                    fontFamily: 'Times New Roman'
-                  ) 
-              )
+              offset: Offset(0, -80),
+              child: Text(
+                'Bassell weather forecaster',
+                style: TextStyle(fontSize: 28, fontFamily: 'Times New Roman'),
+              ),
             ),
-
-
             Transform.translate(
               offset: Offset(0, -70),
               child: SizedBox(
@@ -79,46 +84,40 @@ class _HomePageState extends State<HomePage> {
                     filled: true,
                     prefixIcon: Icon(Icons.calendar_today),
                     enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none 
+                      borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)
+                        borderSide: BorderSide(color: Colors.white)),
                   ),
+                  readOnly: true,
+                  onTap: () {
+                    _showDatePicker();
+                  },
                 ),
-                readOnly: true,
-                onTap: () {
-                  _showDatePicker();
-                },
               ),
             ),
-          ),
-
-
             Transform.translate(
-              offset: Offset(0,50),
-              child: MaterialButton (
-                  onPressed: () => fetchWeatherPrediction(_dateController.text),
-                  child: const Padding(
+              offset: Offset(0, 50),
+              child: MaterialButton(
+                onPressed: _navigateToForecastPage,
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(
-                      "Forecast",
+                  child: Text("Forecast",
                       style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'Times New Roman',
-                     )
-                  )
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'Times New Roman',
+                      )),
                 ),
                 color: Colors.blue,
                 shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0), 
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-            ),  
-          ]
-
+            ),
+          ],
         ),
-      )
+      ),
     );
   }
 }
