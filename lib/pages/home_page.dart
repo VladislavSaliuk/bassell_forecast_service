@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'date.dart';
-import 'weather.dart';
-import 'api.dart';
-import 'forecast_page.dart';
+import '../entity/weather.dart';
+import '../api/api.dart';
+import '../pages/forecast_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,7 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   DateTime _dateTime = DateTime.now();
+
+  TimeOfDay _timeOfDay =  TimeOfDay.now();
+
   TextEditingController _dateController = TextEditingController();
 
   void _showDatePicker() async {
@@ -34,21 +37,42 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _navigateToForecastPage() async {
+
+
+  Future<void> _showTimePicker() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context, 
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _timeOfDay = pickedTime;
+        print(_timeOfDay.toString());
+      });
+    } else {
+      throw Exception('No time selected');
+    }
+  }
+
+void _navigateToForecastPage() async {
   try {
-      Weather weather = await fetchWeatherPrediction(_dateController.text);
-      ForecastPage forecastPage = ForecastPage();
-      forecastPage.weather = weather;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => forecastPage,
-        ),
-      );
+    await _showTimePicker(); 
+    String formattedTime = '${_timeOfDay.hour}:${_timeOfDay.minute}';
+    Weather weather = await fetchWeatherPrediction(formattedTime, _dateController.text);
+    ForecastPage forecastPage = ForecastPage();
+    forecastPage.weather = weather;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => forecastPage,
+      ),
+    );
   } catch (e) {
     print('Error fetching weather prediction: $e');
   }
 }
+
 
   @override
   Widget build(BuildContext context) {

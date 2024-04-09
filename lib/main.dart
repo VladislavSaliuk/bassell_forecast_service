@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'forecast_page.dart';
+import '../pages/home_page.dart';
+import '../pages/forecast_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/forecast_page': (context) => ForecastPage(),
       },
+      theme: ThemeData(brightness: Brightness.dark),
     );
   }
 }
